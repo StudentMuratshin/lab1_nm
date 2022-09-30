@@ -55,18 +55,18 @@ double Nn(const vector<pair<double, double>>& T, double x) {
     return sum;
 }
 
-double Lagrange(double x0, int n, double* x, double* y)
+double Lagrange(double x0, int n, const vector<pair<double, double>>& T)
 {
     double S = 0;
-    for (int i = 0; i <= n; i++)
+    for (int i = 0; i < n; i++)
     {
         double P = 1;
-        for (int j = 0; j <= n; j++)
+        for (int j = 0; j < n; j++)
         {
             if (i == j) continue;
-            P *= (x0 - x[j]) / (x[i] - x[j]);
+            P *= (x0 - T[j].first) / (T[i].first - T[j].first);
         }
-        S += P * y[i];
+        S += P * T[i].second;
     }
     return S;
 }
@@ -90,65 +90,60 @@ int main()
     double h = abs(a - b) / n;
     double L, L2, fx;
     double x[15], y[15];
+    vector<pair<double, double>> table(n);
     ofstream out("output.csv");
     ofstream err("errors.csv");
 
     for (int i = 0; i < n; i++)
     {
-        x[i] = i * h;
-        y[i] = f(x[i]);
+        table[i] = { i * h,f(i * h) };
     }
 
-    h = abs(a - b) / (div * n);
+    //h = abs(a - b) / (div * n);
 
     //задание 2
-    for (int i = 0; i < div * n; i++)
-    {
-        L = Lagrange(i * h, n, x, y);
-        fx = f(i * h);
-        cout << std::fixed;
-        cout << std::setprecision(8);
-        cout << i + 1 << ": " << fx << "  -  " << L << "  =  " << abs(fx - L) << endl << endl;
-        out << i * h << " " << L << endl;
-        if (i != 0) {
-            plot(command_out);
-            //system("pause");
-            Sleep(500);
-        }
-    }
+    //for (int i = 0; i < div * n; i++)
+    //{
+    //    L = Lagrange(i * h, n, table);
+    //    fx = f(i * h);
+    //    cout << std::fixed;
+    //    cout << std::setprecision(8);
+    //    cout << i + 1 << ": " << fx << "  -  " << L << "  =  " << abs(fx - L) << endl << endl;
+    //    out << i * h << " " << L << endl;
+    //    if (i != 0) {
+    //        plot(command_out);
+    //        //system("pause");
+    //        Sleep(500);
+    //    }
+    //}
 
     //задание 3
-    double prev_error;
-    int n0, key = 0;
     for (n = 1; n <= 15; n++)
     {
-        double error = 0;
-        cout << "n:__" << n << "_______________________________________" << endl << endl;
-        h = abs(a - b) / n;
-        for (int i = 0; i < n; i++)
+        vector<pair<double, double>> table3(n + 1);
+        const int k = 1e5;
+        for (int i = 0; i <= n; i++)
         {
-            L = Lagrange(i * h, n, x, y);
-            fx = f(i * h);
-            cout << std::fixed;
-            cout << std::setprecision(8);
-            cout << "i: " << i << "    " << fx << "  -  " << L << "  =  " << abs(fx - L) << endl << endl;
-
-            if (abs(fx - L) > error)
-            {
-                error = abs(fx - L);
+            h = abs(a - b) / n;
+            for (int i = 0; i <= n; i++) {
+                table3[i] = { i * h,f(i * h) };
             }
         }
-        err << n << " " << error << endl;
-        if (key == 0 && error != 0) { prev_error = error; key = 1; }
-
-        if (error != 0 && prev_error > error)
+        h = abs(a - b) / k;
+        double error = 0;
+        for (int i = 0; i <= k; i++)
         {
-            prev_error = error;
-            n0 = n;
-
+            fx = f(i * h);
+            L = Lagrange(i * h, table3.size(), table3);
+            double e = abs(fx - L);
+            if (e > error) error = e;
         }
+        cout << std::fixed;
+        cout << std::setprecision(8);
+        cout << "n = " << n << ", " << error << endl;
+        err << n << " " << error << endl;
+        
     }
-    cout << "Error: " << prev_error << "   Best n0: " << n0;
     plot(command_err);
     system("pause");
     //plot("exit");
@@ -157,34 +152,34 @@ int main()
 
     //Задача 2
     //Задание 1
-    n = 15;
-    double x2[15];
-    double y2[15];
-    for (int i = 0; i < n; i++)
-    {
-        x2[i] = Chebyshev(i, n, a, b);
-        y2[i] = f(x2[i]);
-    }
-    //Задание 2,4
-    for (int i = 0; i < n; i++)
-    {
-        L = Lagrange(i * h, n, x, y);
-        L2 = Lagrange(i * h, n, x2, y2);
-        fx = f(i * h);
-        cout << abs(L2 - L) << endl;
-    }
+    //n = 15;
+    //double x2[15];
+    //double y2[15];
+    //for (int i = 0; i < n; i++)
+    //{
+    //    x2[i] = Chebyshev(i, n, a, b);
+    //    y2[i] = f(x2[i]);
+    //}
+    ////Задание 2,4
+    //for (int i = 0; i < n; i++)
+    //{
+    //    L = Lagrange(i * h, n, x, y);
+    //    L2 = Lagrange(i * h, n, x2, y2);
+    //    fx = f(i * h);
+    //    cout << abs(L2 - L) << endl;
+    //}
 
-    // Задача 4
-    // Задание 1
-    n0 = 3;
-    h = abs(a - b) / n0;
-    vector<pair<double, double>> table{ {1, 6}, {3, 24},{4, 45} };
-    for (int i = 0; i < n0; i++) {
-        table[i] = { i * h,f(i * h) };
-    }
-    for (int i = 0; i < n0; i++) {
-        double e = (f(i * h) - Nn(table, i * h));
-    }
-    cout << Nn(table, 5);
+    //// Задача 4
+    //// Задание 1
+    //int n0 = 3;
+    //h = abs(a - b) / n0;
+    //vector<pair<double, double>> table{ {1, 6}, {3, 24},{4, 45} };
+    //for (int i = 0; i < n0; i++) {
+    //    table[i] = { i * h,f(i * h) };
+    //}
+    //for (int i = 0; i < n0; i++) {
+    //    double e = (f(i * h) - Nn(table, i * h));
+    //}
+    //cout << Nn(table, 5);
     return 0;
 }
