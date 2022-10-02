@@ -76,6 +76,22 @@ double Chebyshev(int i, int n, double a, double b)
     return (b + a) / 2 + (b - a) / 2 * cos(3.14 * (2 * i + 1) / (2 * n));
 }
 
+double Max_Error(double a, double b, const vector<pair<double, double>>& T)
+{
+    const int k = 1e5;
+    double h = abs(a - b) / k;
+    double error = 0;
+    double fx, L;
+    for (int i = 0; i <= k; i++)
+    {
+        fx = f(i * h);
+        L = Lagrange(i * h, T.size(), T);
+        double e = abs(fx - L);
+        if (e > error) error = e;
+    }
+    return error;
+}
+
 int main()
 {
     Gnuplot plot;
@@ -83,10 +99,10 @@ int main()
         "set yrange [-5:5];"
         "plot 'output.csv' using 1:2 w l lt 1 lw 5 , log(x + 1)* sin(x)";
     string command_err = "set xrange [0:20];"
-        "set yrange [0:77];"
+        "set yrange [0:5];"
         "plot 'errors.csv' using 1:2 w l";
     int n = 15, div = 2;
-    double a = 0, b = 3 * 3.14;
+    double a = 0, b = 3 * 3.14159265358979323846;
     double h = abs(a - b) / n;
     double L, L2, fx;
     double x[15], y[15];
@@ -99,9 +115,10 @@ int main()
         table[i] = { i * h,f(i * h) };
     }
 
-    //h = abs(a - b) / (div * n);
+    
 
     //задание 2
+    //h = abs(a - b) / (div * n);
     //for (int i = 0; i < div * n; i++)
     //{
     //    L = Lagrange(i * h, n, table);
@@ -117,57 +134,46 @@ int main()
     //    }
     //}
 
-    //задание 3
+    //задание 2, 3
     for (n = 1; n <= 15; n++)
     {
-        vector<pair<double, double>> table3(n + 1);
-        const int k = 1e5;
+        vector<pair<double, double>> table2(n + 1);
         for (int i = 0; i <= n; i++)
         {
             h = abs(a - b) / n;
-            for (int i = 0; i <= n; i++) {
-                table3[i] = { i * h,f(i * h) };
-            }
+            table2[i] = { i * h,f(i * h) };
+            out << table2[i].first << " " << table2[i].second << endl;
         }
-        h = abs(a - b) / k;
-        double error = 0;
-        for (int i = 0; i <= k; i++)
-        {
-            fx = f(i * h);
-            L = Lagrange(i * h, table3.size(), table3);
-            double e = abs(fx - L);
-            if (e > error) error = e;
-        }
+        //plot(command_out);
+        //Sleep(3000);
+        //ofstream file("output.csv");
+        double error = Max_Error(a, b, table2);
         cout << std::fixed;
         cout << std::setprecision(8);
-        cout << "n = " << n << ", " << error << endl;
+        int m = 9;
+        if (n < 10) m = 11;
+        cout << "n = " << n <<  ", " << setw(m) << error << endl;
         err << n << " " << error << endl;
         
     }
-    plot(command_err);
-    system("pause");
+    //plot(command_err);
+    //system("pause");
     //plot("exit");
     out.close();
     err.close();
 
     //Задача 2
     //Задание 1
-    //n = 15;
-    //double x2[15];
-    //double y2[15];
-    //for (int i = 0; i < n; i++)
-    //{
-    //    x2[i] = Chebyshev(i, n, a, b);
-    //    y2[i] = f(x2[i]);
-    //}
-    ////Задание 2,4
-    //for (int i = 0; i < n; i++)
-    //{
-    //    L = Lagrange(i * h, n, x, y);
-    //    L2 = Lagrange(i * h, n, x2, y2);
-    //    fx = f(i * h);
-    //    cout << abs(L2 - L) << endl;
-    //}
+    cout << endl << "Chebyshev - Lagrange:" << endl << endl;
+    n = 15;
+    vector<pair<double, double>> table_Cheb(n);
+    for (int i = 0; i < n; i++)
+    {
+        table_Cheb[i].first = Chebyshev(i, n, a, b);
+        table_Cheb[i].second = f(table_Cheb[i].first);
+    }
+    //задание 2,4
+    cout << "ERROR Lagrange:  " << Max_Error(a, b, table) << endl << "ERROR Chebyshev: " << Max_Error(a, b, table_Cheb);
 
     //// Задача 4
     //// Задание 1
