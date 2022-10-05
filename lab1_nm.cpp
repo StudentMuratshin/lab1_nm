@@ -6,6 +6,8 @@
 #include <cmath>
 #include "gnuplot.h"
 #include "windows.h"
+#include <chrono>
+#define M_PI 3.14159265358979323846
 
 
 using namespace std;
@@ -13,6 +15,56 @@ using namespace std;
 double f(double x)
 {
     return log(x + 1) * sin(x);
+}
+
+double ft(double t)
+{
+    return log((3 * t + 2) / 2.0) * sin(3 * t / 2.0);
+}
+
+double a0(const int n, const vector<pair<double, double>>& T)
+{
+    double sum = 0;
+    for (int j = 0; j <= 2 * n; j++)
+    {
+        sum += ft(T[j].first);
+    }
+    return sum / (2 * n + 1);
+}
+
+double ak(const int n, int k, const vector<pair<double, double>>& T)
+{
+    double sum = 0;
+    for (int j = 1; j <= 2 * n + 1; j++)
+    {
+        sum += ft(T[j - 1].first) * cos((2 * M_PI * k * j) / (2 * n + 1));
+    }
+    return 2 * sum / (2 * n + 1);
+}
+
+double bk(const int n, int k, const vector<pair<double, double>>& T)
+{
+    double sum = 0;
+    for (int j = 1; j <= 2 * n + 1; j++)
+    {
+        sum += ft(T[j - 1].first) * sin((2 * M_PI * k * j) / (2 * n + 1));
+    }
+    return 2 * sum / (2 * n + 1);
+}
+
+double Fourier(int n, double t, const vector<pair<double, double>>& T)
+{
+    double sum = 0;
+    for (int k = 1; k <= n; k++)
+    {
+        /*cout << std::setprecision(20);
+        cout << ak(n, k, t) << " " << bk(n, k, t) << endl;
+        cout << cos(k * t) << " " << sin(k * t) << endl;
+        cout << ak(n, k, t) * cos(k * t) << " " << bk(n, k, t) * sin(k * t) << endl;*/
+        sum += ak(n, k, T) * cos(k * t) + bk(n, k, T) * sin(k * t);
+        //cout << sum << endl << endl;
+    }
+    return a0(n, T) / 2.0 + sum;
 }
 
 struct opt_dbl {
@@ -76,21 +128,35 @@ double Chebyshev(int i, int n, double a, double b)
     return (b + a) / 2 + (b - a) / 2 * cos(3.14 * (2 * i + 1) / (2 * n));
 }
 
-double Max_Error(double a, double b, const vector<pair<double, double>>& T)
+double Max_Error(double a, double b, const vector<pair<double, double>>& T, string Name)
 {
     const int k = 1e5;
     double h = abs(a - b) / k;
     double error = 0;
-    double fx, L;
-    for (int i = 0; i <= k; i++)
+    double fx, L, Newton;
+    if (Name == "Lagrange")
     {
-        fx = f(i * h);
-        L = Lagrange(i * h, T.size(), T);
-        double e = abs(fx - L);
-        if (e > error) error = e;
+        for (int i = 0; i <= k; i++)
+        {
+            fx = f(i * h);
+            L = Lagrange(i * h, T.size(), T);
+            double e = abs(fx - L);
+            if (e > error) error = e;
+        }
+    }
+    else
+    {
+        for (int i = 0; i <= k; i++)
+        {
+            fx = f(i * h);
+            Newton = Nn(T, i * h);
+            double e = abs(fx - Newton);
+            if (e > error) error = e;
+        }
     }
     return error;
 }
+
 
 int main()
 {
@@ -101,14 +167,18 @@ int main()
     string command_err = "set xrange [0:20];"
         "set yrange [0:5];"
         "plot 'errors.csv' using 1:2 w l";
-    int n = 15, div = 2;
-    double a = 0, b = 3 * 3.14159265358979323846;
+    string command_Fou = "set xrange [-1:10];"
+        "set yrange [-5:5];"
+        "plot 'outF.csv' using 1:2 w l lt 1 lw 5 , log((3 * x + 2) / 2.0) * sin(3 * x / 2.0)";
+    const int n = 15;
+    double a = 0, b = 3 * M_PI;
     double h = abs(a - b) / n;
     double L, L2, fx;
     double x[15], y[15];
     vector<pair<double, double>> table(n);
     ofstream out("output.csv");
     ofstream err("errors.csv");
+    ofstream Fou("outF.csv");
 
     for (int i = 0; i < n; i++)
     {
@@ -135,19 +205,19 @@ int main()
     //}
 
     //задание 2, 3
-    for (n = 1; n <= 15; n++)
+    for (int n = 1; n <= 15; n++)
     {
         vector<pair<double, double>> table2(n + 1);
         for (int i = 0; i <= n; i++)
         {
             h = abs(a - b) / n;
             table2[i] = { i * h,f(i * h) };
-            out << table2[i].first << " " << table2[i].second << endl;
+            //out << table2[i].first << " " << table2[i].second << endl;
         }
         //plot(command_out);
         //Sleep(3000);
         //ofstream file("output.csv");
-        double error = Max_Error(a, b, table2);
+        double error = Max_Error(a, b, table2, "Lagrange");
         cout << std::fixed;
         cout << std::setprecision(8);
         int m = 9;
@@ -159,13 +229,10 @@ int main()
     //plot(command_err);
     //system("pause");
     //plot("exit");
-    out.close();
-    err.close();
 
     //Задача 2
     //Задание 1
     cout << endl << "Chebyshev - Lagrange:" << endl << endl;
-    n = 15;
     vector<pair<double, double>> table_Cheb(n);
     for (int i = 0; i < n; i++)
     {
@@ -173,19 +240,38 @@ int main()
         table_Cheb[i].second = f(table_Cheb[i].first);
     }
     //задание 2,4
-    cout << "ERROR Lagrange:  " << Max_Error(a, b, table) << endl << "ERROR Chebyshev: " << Max_Error(a, b, table_Cheb);
+    //cout << "ERROR Lagrange:  " << Max_Error(a, b, table, "Lagrange") << endl; 
+    cout << "ERROR Chebyshev: " << Max_Error(a, b, table_Cheb, "Lagrange") << endl;
 
-    //// Задача 4
-    //// Задание 1
-    //int n0 = 3;
-    //h = abs(a - b) / n0;
-    //vector<pair<double, double>> table{ {1, 6}, {3, 24},{4, 45} };
-    //for (int i = 0; i < n0; i++) {
-    //    table[i] = { i * h,f(i * h) };
-    //}
-    //for (int i = 0; i < n0; i++) {
-    //    double e = (f(i * h) - Nn(table, i * h));
-    //}
-    //cout << Nn(table, 5);
+    auto start = chrono::high_resolution_clock::now();
+    cout << "ERROR Lagrange:  " << Max_Error(a, b, table, "Lagrange") << endl;
+    auto end = chrono::high_resolution_clock::now();
+    double seconds = chrono::duration_cast<chrono::milliseconds>(end - start).count() / 1e3;
+    printf("Lagrange worked for %.3f seconds\n", seconds);
+
+    start = chrono::high_resolution_clock::now();
+    Max_Error(a, b, table, "Newton");
+    end = chrono::high_resolution_clock::now();
+    seconds = chrono::duration_cast<chrono::milliseconds>(end - start).count() / 1e3;
+    printf("Newton worked for %.3f seconds\n", seconds);
+
+    //Задача 4
+    //Заданаие 1
+    vector<pair<double, double>> table_F;
+    for (int i = 1; i <= 2 * n + 1; i++)
+    {
+        table_F.push_back( { 2 * M_PI * (i - 1) / (2 * n + 1), 0});
+    }
+    cout << endl;
+    for (int i = 0; i <= 2 * n; i++)
+    {
+        table_F[i].second = Fourier(n, table_F[i].first, table_F); // normirui
+        cout << "res " << table_F[i].first << " " << table_F[i].second << endl << endl;
+        Fou << table_F[i].first << " " << table_F[i].second << endl;
+    }
+    plot(command_Fou);
+    system("pause");
+    out.close();
+    err.close();
     return 0;
 }
