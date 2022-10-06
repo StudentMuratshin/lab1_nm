@@ -138,12 +138,12 @@ double Chebyshev(int i, int n, double a, double b)
     return (b + a) / 2 + (b - a) / 2 * cos(3.14 * (2 * i + 1) / (2 * n));
 }
 
-double Max_Error(double a, double b, const vector<pair<double, double>>& T, string Name)
+double Max_Error(int n, double a, double b, const vector<pair<double, double>>& T, string Name)
 {
     const int k = 1e5;
     double h = abs(a - b) / k;
     double error = 0;
-    double fx, L, Newton;
+    double fT, fx, L, Newton, four;
     if (Name == "Lagrange")
     {
         for (int i = 0; i <= k; i++)
@@ -154,13 +154,23 @@ double Max_Error(double a, double b, const vector<pair<double, double>>& T, stri
             if (e > error) error = e;
         }
     }
-    else
+    else if (Name == "Newton")
     {
         for (int i = 0; i <= k; i++)
         {
             fx = f(i * h);
             Newton = Nn(T, i * h);
             double e = abs(fx - Newton);
+            if (e > error) error = e;
+        }
+    }
+    else
+    {
+        for (int i = 0; i <= k; i++)
+        {
+            fT = ft(i * h);
+            four = Fourier(n, i * h, T);
+            double e = abs(fT - four);
             if (e > error) error = e;
         }
     }
@@ -178,7 +188,7 @@ int main()
         "set yrange [0:5];"
         "plot 'errors.csv' using 1:2 w l";
     string command_Fou = "set xrange [-1:10];"
-        "set yrange [-4:4];"
+        "set yrange [-2:3];"
         "plot 'outF.csv' using 1:2 w l lt 1 lw 3 , log((3 * x + 2) / 2.0) * sin(3 * x / 2.0)";
     const int n = 15;
     double a = 0, b = 3 * M_PI;
@@ -227,7 +237,7 @@ int main()
         //plot(command_out);
         //Sleep(3000);
         //ofstream file("output.csv");
-        double error = Max_Error(a, b, table2, "Lagrange");
+        double error = Max_Error(n, a, b, table2, "Lagrange");
         cout << std::fixed;
         cout << std::setprecision(8);
         int m = 9;
@@ -251,34 +261,36 @@ int main()
     }
     //задание 2,4
     //cout << "ERROR Lagrange:  " << Max_Error(a, b, table, "Lagrange") << endl; 
-    cout << "ERROR Chebyshev: " << Max_Error(a, b, table_Cheb, "Lagrange") << endl;
+    cout << "ERROR Chebyshev: " << Max_Error(n, a, b, table_Cheb, "Lagrange") << endl;
 
     auto start = chrono::high_resolution_clock::now();
-    cout << "ERROR Lagrange:  " << Max_Error(a, b, table, "Lagrange") << endl;
+    cout << "ERROR Lagrange:  " << Max_Error(n, a, b, table, "Lagrange") << endl;
     auto end = chrono::high_resolution_clock::now();
     double seconds = chrono::duration_cast<chrono::milliseconds>(end - start).count() / 1e3;
     printf("Lagrange worked for %.3f seconds\n", seconds);
 
     start = chrono::high_resolution_clock::now();
-    Max_Error(a, b, table, "Newton");
+    Max_Error(n, a, b, table, "Newton");
     end = chrono::high_resolution_clock::now();
     seconds = chrono::duration_cast<chrono::milliseconds>(end - start).count() / 1e3;
     printf("Newton worked for %.3f seconds\n", seconds);
 
     //Задача 4
     //Заданаие 1
+    const int N = 100;
     vector<pair<double, double>> table_F;
-    for (int i = 0; i <= 2 * n; i++)
+    for (int i = 0; i <= 2 * N; i++)
     {
-        table_F.push_back( { 2 * M_PI * i / (2 * n + 1), 0});
+        table_F.push_back( { 2 * M_PI * i / (2 * N + 1), 0});
     }
     cout << endl;
-    for (int i = 0; i <= 2 * n; i++)
+    for (int i = 0; i <= 2 * N; i++)
     {
-        table_F[i].second = Fourier(n, table_F[i].first, table_F); // normirui
+        table_F[i].second = Fourier(N, table_F[i].first, table_F); 
         cout << table_F[i].first << " " << table_F[i].second << endl << endl;
         Fou << table_F[i].first << " " << table_F[i].second << endl;
     }
+    cout << Max_Error(N, 0, 2 * M_PI, table_F, "Fourier") << endl;
     plot(command_Fou);
     system("pause");
     out.close();
