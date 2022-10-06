@@ -35,19 +35,29 @@ double a0(const int n, const vector<pair<double, double>>& T)
 double ak(const int n, int k, const vector<pair<double, double>>& T)
 {
     double sum = 0;
-    for (int j = 1; j <= 2 * n + 1; j++)
+    if (k == 0)
     {
-        sum += ft(T[j - 1].first) * cos((2 * M_PI * k * j) / (2 * n + 1));
+        for (int j = 0; j <= 2 * n; j++)
+        {
+            sum += ft(T[j].first);
+        }
+        return sum / (2 * n + 1);
+    }
+
+    for (int j = 0; j <= 2 * n; j++)
+    {
+        sum += ft(T[j].first) * cos((2 * M_PI * k * j) / (2 * n + 1));
     }
     return 2 * sum / (2 * n + 1);
 }
 
 double bk(const int n, int k, const vector<pair<double, double>>& T)
 {
+    if (k == 0) return 0;
     double sum = 0;
-    for (int j = 1; j <= 2 * n + 1; j++)
+    for (int j = 0; j <= 2 * n; j++)
     {
-        sum += ft(T[j - 1].first) * sin((2 * M_PI * k * j) / (2 * n + 1));
+        sum += ft(T[j].first) * sin((2 * M_PI * k * j) / (2 * n + 1));
     }
     return 2 * sum / (2 * n + 1);
 }
@@ -55,7 +65,7 @@ double bk(const int n, int k, const vector<pair<double, double>>& T)
 double Fourier(int n, double t, const vector<pair<double, double>>& T)
 {
     double sum = 0;
-    for (int k = 1; k <= n; k++)
+    for (int k = 0; k <= n; k++)
     {
         /*cout << std::setprecision(20);
         cout << ak(n, k, t) << " " << bk(n, k, t) << endl;
@@ -64,7 +74,7 @@ double Fourier(int n, double t, const vector<pair<double, double>>& T)
         sum += ak(n, k, T) * cos(k * t) + bk(n, k, T) * sin(k * t);
         //cout << sum << endl << endl;
     }
-    return a0(n, T) / 2.0 + sum;
+    return sum;
 }
 
 struct opt_dbl {
@@ -161,15 +171,15 @@ double Max_Error(double a, double b, const vector<pair<double, double>>& T, stri
 int main()
 {
     Gnuplot plot;
-    string command_out = "set xrange [-1:10];"
+    string command_out = "set xrange [0:10];"
         "set yrange [-5:5];"
         "plot 'output.csv' using 1:2 w l lt 1 lw 5 , log(x + 1)* sin(x)";
     string command_err = "set xrange [0:20];"
         "set yrange [0:5];"
         "plot 'errors.csv' using 1:2 w l";
     string command_Fou = "set xrange [-1:10];"
-        "set yrange [-5:5];"
-        "plot 'outF.csv' using 1:2 w l lt 1 lw 5 , log((3 * x + 2) / 2.0) * sin(3 * x / 2.0)";
+        "set yrange [-4:4];"
+        "plot 'outF.csv' using 1:2 w l lt 1 lw 3 , log((3 * x + 2) / 2.0) * sin(3 * x / 2.0)";
     const int n = 15;
     double a = 0, b = 3 * M_PI;
     double h = abs(a - b) / n;
@@ -258,15 +268,15 @@ int main()
     //Задача 4
     //Заданаие 1
     vector<pair<double, double>> table_F;
-    for (int i = 1; i <= 2 * n + 1; i++)
+    for (int i = 0; i <= 2 * n; i++)
     {
-        table_F.push_back( { 2 * M_PI * (i - 1) / (2 * n + 1), 0});
+        table_F.push_back( { 2 * M_PI * i / (2 * n + 1), 0});
     }
     cout << endl;
     for (int i = 0; i <= 2 * n; i++)
     {
         table_F[i].second = Fourier(n, table_F[i].first, table_F); // normirui
-        cout << "res " << table_F[i].first << " " << table_F[i].second << endl << endl;
+        cout << table_F[i].first << " " << table_F[i].second << endl << endl;
         Fou << table_F[i].first << " " << table_F[i].second << endl;
     }
     plot(command_Fou);
