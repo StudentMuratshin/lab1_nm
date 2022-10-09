@@ -130,6 +130,10 @@
   <ItemGroup>
     <ClCompile Include="lab1_nm.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="fun.h" />
+    <ClInclude Include="spline.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
