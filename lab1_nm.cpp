@@ -8,6 +8,7 @@
 #include "fun.h"
 #include "spline.h"
 #include "windows.h"
+#include "MNRP.h"
 #include <chrono>
 #define M_PI 3.14159265358979323846
 
@@ -61,107 +62,113 @@ int main()
     //    }
     //}
 
-    //задание 2, 3
-    for (int n = 1; n <= 15; n++)
-    {
-        vector<pair<double, double>> table2(n + 1);
-        for (int i = 0; i <= n; i++)
-        {
-            H = abs(A - B) / n;
-            table2[i] = { i * H,f(i * H) };
-            out << table2[i].first << " " << table2[i].second << endl;
-        }
-        //plot(command_out);
-        //Sleep(3000);
-        ofstream file("output.csv");
-        double error = Max_Error(n, A, B, table2, "Lagrange");
-        cout << std::fixed;
-        cout << std::setprecision(8);
-        int m = 9;
-        if (n < 10) m = 11;
-        cout << "n = " << n <<  ", " << setw(m) << error << endl;
-        err << n << " " << error << endl;
-        
-    }
-    //plot(command_err);
+    ////задание 2, 3
+    //for (int n = 1; n <= 15; n++)
+    //{
+    //    vector<pair<double, double>> table2(n + 1);
+    //    for (int i = 0; i <= n; i++)
+    //    {
+    //        H = abs(A - B) / n;
+    //        table2[i] = { i * H,f(i * H) };
+    //        out << table2[i].first << " " << table2[i].second << endl;
+    //    }
+    //    //plot(command_out);
+    //    //Sleep(3000);
+    //    ofstream file("output.csv");
+    //    double error = Max_Error(n, A, B, table2, "Lagrange");
+    //    cout << std::fixed;
+    //    cout << std::setprecision(8);
+    //    int m = 9;
+    //    if (n < 10) m = 11;
+    //    cout << "n = " << n <<  ", " << setw(m) << error << endl;
+    //    err << n << " " << error << endl;
+    //    
+    //}
+    ////plot(command_err);
+    ////system("pause");
+
+    ////Задача 2
+    ////Задание 1
+    //cout << endl << "Chebyshev - Lagrange:" << endl << endl;
+    //vector<pair<double, double>> table_Cheb(n);
+    //for (int i = 0; i < n; i++)
+    //{
+    //    table_Cheb[i].first = Chebyshev(i, n, A, B);
+    //    table_Cheb[i].second = f(table_Cheb[i].first);
+    //}
+    ////задание 2,4
+    ////cout << "ERROR Chebyshev: " << Max_Error(n, A, B, table_Cheb, "Lagrange") << endl;
+
+    //auto start = chrono::high_resolution_clock::now();
+    ////cout << "ERROR Lagrange:  " << Max_Error(n, A, B, table, "Lagrange") << endl;
+    //auto end = chrono::high_resolution_clock::now();
+    //double seconds = chrono::duration_cast<chrono::milliseconds>(end - start).count() / 1e3;
+    //printf("Lagrange worked for %.3f seconds\n", seconds);
+
+    //start = chrono::high_resolution_clock::now();
+    ////Max_Error(n, A, B, table, "Newton");
+    //end = chrono::high_resolution_clock::now();
+    //seconds = chrono::duration_cast<chrono::milliseconds>(end - start).count() / 1e3;
+    //printf("Newton worked for %.3f seconds\n", seconds);
+
+    ////Задача 4
+    ////Заданаие 1
+    //const int N = 15;
+    //vector<pair<double, double>> table_F;
+    //for (int i = 0; i <= 2 * N; i++)
+    //{
+    //    table_F.push_back( { 2 * M_PI * i / (2 * N + 1), 0});
+    //}
+    //cout << endl;
+    //for (int i = 0; i <= 2 * N; i++)
+    //{
+    //    table_F[i].second = Fourier(N, table_F[i].first, table_F); 
+    //    //cout << table_F[i].first << " " << table_F[i].second << endl << endl;
+    //    Fou << table_F[i].first << " " << table_F[i].second << endl;
+    //}
+    //cout << "Max error | Fourier - fx | =  " << Max_Error(N, 0, 2 * M_PI, table_F, "Fourier") << endl;
+    //plot(command_Fou);
     //system("pause");
 
-    //Задача 2
-    //Задание 1
-    cout << endl << "Chebyshev - Lagrange:" << endl << endl;
-    vector<pair<double, double>> table_Cheb(n);
-    for (int i = 0; i < n; i++)
-    {
-        table_Cheb[i].first = Chebyshev(i, n, A, B);
-        table_Cheb[i].second = f(table_Cheb[i].first);
-    }
-    //задание 2,4
-    cout << "ERROR Chebyshev: " << Max_Error(n, A, B, table_Cheb, "Lagrange") << endl;
+    ////задание 6
+    ////vector<pair<double, double>> table{ { 1,2 }, { 2,3 }, { 4,1 }, { 7,4 } };
+    //n = table.size() - 1;
+    //vector<double> h(n + 1);
+    //vector<double> a(n);
+    //vector<double> b(n);
+    //vector<double> c(n + 1, { 0 });
+    //vector<double> d(n);
 
-    auto start = chrono::high_resolution_clock::now();
-    cout << "ERROR Lagrange:  " << Max_Error(n, A, B, table, "Lagrange") << endl;
-    auto end = chrono::high_resolution_clock::now();
-    double seconds = chrono::duration_cast<chrono::milliseconds>(end - start).count() / 1e3;
-    printf("Lagrange worked for %.3f seconds\n", seconds);
+    //vector<double> Alpha(n + 1, { 0 });
+    //vector<double> Betta(n + 1, { 1 });
+    //vector<double> Gamma(n + 1, { 0 });
+    //vector<double> Omega(n + 1, { 0 });
 
-    start = chrono::high_resolution_clock::now();
-    Max_Error(n, A, B, table, "Newton");
-    end = chrono::high_resolution_clock::now();
-    seconds = chrono::duration_cast<chrono::milliseconds>(end - start).count() / 1e3;
-    printf("Newton worked for %.3f seconds\n", seconds);
+    //inicilization_h(n, table, h);
+    //inicilization_ABGO(n, h, table, Alpha, Betta, Gamma, Omega);
 
-    //Задача 4
-    //Заданаие 1
-    const int N = 15;
-    vector<pair<double, double>> table_F;
-    for (int i = 0; i <= 2 * N; i++)
-    {
-        table_F.push_back( { 2 * M_PI * i / (2 * N + 1), 0});
-    }
-    cout << endl;
-    for (int i = 0; i <= 2 * N; i++)
-    {
-        table_F[i].second = Fourier(N, table_F[i].first, table_F); 
-        cout << table_F[i].first << " " << table_F[i].second << endl << endl;
-        Fou << table_F[i].first << " " << table_F[i].second << endl;
-    }
-    cout << Max_Error(N, 0, 2 * M_PI, table_F, "Fourier") << endl;
-    plot(command_Fou);
-    system("pause");
+    //matrix_solution(n, c, Alpha, Betta, Gamma, Omega);
 
-    //задание 6
-    //vector<pair<double, double>> table{ { 1,2 }, { 2,3 }, { 4,1 }, { 7,4 } };
-    n = table.size() - 1;
-    vector<double> h(n + 1);
-    vector<double> a(n);
-    vector<double> b(n);
-    vector<double> c(n + 1, { 0 });
-    vector<double> d(n);
-
-    vector<double> Alpha(n + 1, { 0 });
-    vector<double> Betta(n + 1, { 1 });
-    vector<double> Gamma(n + 1, { 0 });
-    vector<double> Omega(n + 1, { 0 });
-
-    inicilization_h(n, table, h);
-    inicilization_ABGO(n, h, table, Alpha, Betta, Gamma, Omega);
-
-    matrix_solution(n, c, Alpha, Betta, Gamma, Omega);
-
-    inicilization_a(n, table, a);
-    inicilization_b(n, table, b, h, c);
-    inicilization_d(n, table, d, h, c);
-
-    for (int i = 0; i < table.size() - 1; i++)
-    {
-        for (int j = 0; j < 1e3; j++)
-        {
-            H = table[i].first + j * (table[i + 1].first - table[i].first) / 1e3;
-            spline << H <<  " " << ff(a[i], b[i], c[i], d[i], H, table[i].first) << endl;
-        }
-    }
-    plot(command_spline);
-    system("pause");
+    //inicilization_a(n, table, a);
+    //inicilization_b(n, table, b, h, c);
+    //inicilization_d(n, table, d, h, c);
+    //double s, ERRor = 0;
+    //for (int i = 0; i < table.size() - 1; i++)
+    //{
+    //    for (int j = 0; j < 1e3; j++)
+    //    {
+    //        H = table[i].first + j * (table[i + 1].first - table[i].first) / 1e3;
+    //        s = ff(a[i], b[i], c[i], d[i], H, table[i].first);
+    //        spline << H <<  " " << s << endl;
+    //        if (abs(s - f(H)) > ERRor)
+    //        {
+    //            ERRor = abs(s - f(H));
+    //        }
+    //    }
+    //}
+    //cout << "Max error | splyne - fx | = " << ERRor << endl;
+    //plot(command_spline);
+    //system("pause");
     /*for (int i = 0; i < c.size() - 1; i++)
     {
         cout << i << " a " << a[i] << endl;
@@ -170,6 +177,27 @@ int main()
         cout << i << " d " << d[i] << endl;
         cout << "__________________________" << endl;
     }*/
+
+    //задание 5
+    int T = 22;
+    vector <pair<double, double>> TABLE_taylor(0);
+    double delta = 2 * 1e-3;
+    cout << "Taylor's error at " << T << ": " << ERROR_Taylor(A, B, TABLE_taylor, "fx") << endl;
+    for (int i = T - 1; i > 0; i--)
+    {
+        vector <pair<double, double>> TABLE_taylor(i);
+        for (int j = 0; j < i; j++)
+        {
+            TABLE_taylor[j].first = { Chebyshev(j, i, A, B) };
+            TABLE_taylor[j].second = { f(TABLE_taylor[j].first) };
+        }
+        ERROR_Taylor(A, B, TABLE_taylor, "taylor");
+        if (ERROR_Taylor(A, B, TABLE_taylor, "taylor") >= delta)
+        {
+            cout << i << endl;
+            break;
+        }
+    }
     spline.close();
     out.close();
     err.close();

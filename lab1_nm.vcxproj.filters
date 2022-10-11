@@ -26,5 +26,8 @@
     <ClInclude Include="spline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MNRP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

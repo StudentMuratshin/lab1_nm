@@ -45,10 +45,10 @@ void inicilization_ABGO(const int& n, vector<double>& h, const vector<pair<doubl
 {
 	for (int i = 2; i <= n; i++)
 	{
-		Alpha[i-1] = h[i - 1];
-		Betta[i-1] = 2 * (h[i - 1] + h[i]);
-		Gamma[i-1] = h[i];
-		Omega[i-1] = 3 * ((T[i].second - T[i - 1].second) / h[i] - (T[i - 1].second - T[i - 2].second) / h[i - 1]);
+		Alpha[i - 1] = h[i - 1];
+		Betta[i - 1] = 2 * (h[i - 1] + h[i]);
+		Gamma[i - 1] = h[i];
+		Omega[i - 1] = 3 * ((T[i].second - T[i - 1].second) / h[i] - (T[i - 1].second - T[i - 2].second) / h[i - 1]);
 	}
 }
 
